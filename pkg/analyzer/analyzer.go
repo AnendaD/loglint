@@ -1,7 +1,7 @@
 package analyzer
 
 import (
-	"selectellinter/config"
+	"github.com/AnendaD/loglint/config"
 
 	"golang.org/x/tools/go/analysis"
 )

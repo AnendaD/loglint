@@ -3,8 +3,8 @@ package analyzer
 import (
 	"go/ast"
 	"go/token"
-	"selectellinter/config"
-	"selectellinter/pkg/analyzer/detector"
+	"github.com/AnendaD/loglint/config"
+	"github.com/AnendaD/loglint/pkg/analyzer/detector"
 	"strings"
 	"unicode"
 	"unicode/utf8"

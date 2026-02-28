@@ -1,7 +1,7 @@
 package detector_test
 
 import (
-	"selectellinter/pkg/analyzer/detector"
+	"github.com/AnendaD/loglint/pkg/analyzer/detector"
 	"testing"
 )
 

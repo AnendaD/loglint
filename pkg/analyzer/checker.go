@@ -3,8 +3,8 @@ package analyzer
 import (
 	"go/ast"
 	"go/types"
-	"selectellinter/config"
-	"selectellinter/pkg/analyzer/detector"
+	"github.com/AnendaD/loglint/config"
+	"github.com/AnendaD/loglint/pkg/analyzer/detector"
 
 	"golang.org/x/tools/go/analysis"
 )
