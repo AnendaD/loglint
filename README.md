@@ -1,4 +1,4 @@
-# selectellinter
+# loglinter
 
 Go linter for log message validation. Checks log calls from `log/slog` and `go.uber.org/zap` against a set of rules.
 
@@ -40,7 +40,7 @@ selectellinter/
 
 ## Requirements
 
-- Go 1.22+
+- Go 1.26+
 - `CGO_ENABLED=1` (required for the golangci-lint plugin)
 - golangci-lint v2.x
 
@@ -109,13 +109,19 @@ custom_patterns:
     pattern: "(?i)AKIA[0-9A-Z]{16}"
     message: "AWS access key detected"
     auto_fix: true
-    replacement: "AWS_KEY=[REDACTED]"
+    replacement: "AWS_KEY /REDACTED/"
 
   - name: jwt_token
     pattern: "eyJ[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+"
     message: "JWT token detected"
     auto_fix: true
-    replacement: "JWT=[REDACTED]"
+    replacement: "JWT /REDACTED/"
+
+  - name: password_inline
+    pattern: "(?i)password\\s*[:=]\\s*\\S+"
+    message: "inline password value detected"
+    auto_fix: true
+    replacement: "password /REDACTED/"
 ```
 
 ## golangci-lint integration
@@ -142,43 +148,107 @@ Run:
 CONFIG_PATH=./config/config.yaml golangci-lint run ./...
 ```
 
-## Usage examples
+## Usage example
+
+Given `examples/ex.go`:
 
 ```go
-// ❌ will be reported
-slog.Info("Starting server on port 8080")   // Log must start with a lowercase letter
-slog.Info("запуск сервера")                  // log message must be in English
-slog.Error("connection failed!!!")           // log message must not contain special characters or emoji
-slog.Debug("request", "api_key", apiKey)     // log message contains sensitive keyword: "api_key"
-slog.Info("key: AKIAIOSFODNN7EXAMPLE")       // AWS access key detected
+package main
 
-// ✅ correct
-slog.Info("starting server on port 8080")
-slog.Info("starting server")
-slog.Error("connection failed")
-slog.Debug("request completed")
+import (
+	"log/slog"
+	"os"
+
+	"go.uber.org/zap"
+)
+
+func main() {
+	// --- slog logger via variable ---
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+
+	logger.Info("Starting server on port 8080")       // ❌ uppercase
+	logger.Error("ошибка подключения к базе данных")  // ❌ not English
+	logger.Warn("server started!!! 🚀")               // ❌ special chars + emoji
+	password := "supersecret"
+	logger.Info("user login", "pass", password)       // ❌ sensitive keyword in ident
+	logger.Info("password: supersecret")              // ❌ inline password pattern
+
+	// --- zap logger via variable ---
+	zapLogger, _ := zap.NewProduction()
+	defer zapLogger.Sync()
+
+	zapLogger.Info("Failed to process request")       // ❌ uppercase
+	zapLogger.Error("запуск воркера завершён")         // ❌ not English
+	zapLogger.Warn("connection lost... 💀")           // ❌ special chars + emoji
+	userToken := "eyJhbGciOiJIUzI1NiJ9.payload.sig"
+	zapLogger.Info("request received", zap.String("auth", userToken)) // ❌ sensitive keyword in ident
+}
 ```
+
+Running the linter:
+
+```
+$ CONFIG_PATH=./config/config.yaml golangci-lint run ./examples/ex.go
+
+ex.go:14:14: linter: Log must start with a lowercase letter (loglint)
+        logger.Info("Starting server on port 8080")
+                    ^
+ex.go:16:2:  linter: log message must be in English (found: о) (loglint)
+        logger.Error("ошибка подключения к базе данных")
+        ^
+ex.go:18:14: linter: log message must not contain special characters or emoji (loglint)
+        logger.Warn("server started!!! 🚀")
+                    ^
+ex.go:21:2:  linter: log message contains sensitive keyword: "password" (loglint)
+        logger.Info("user login", "pass", password)
+        ^
+ex.go:23:14: linter: inline password value detected (loglint)
+        logger.Info("password: supersecret")
+                    ^
+ex.go:28:17: linter: Log must start with a lowercase letter (loglint)
+        zapLogger.Info("Failed to process request")
+                       ^
+ex.go:30:2:  linter: log message must be in English (found: з) (loglint)
+        zapLogger.Error("запуск воркера завершён")
+        ^
+ex.go:32:17: linter: log message must not contain special characters or emoji (loglint)
+        zapLogger.Warn("connection lost... 💀")
+                       ^
+ex.go:35:2:  linter: log message contains sensitive keyword: "token" (loglint)
+        zapLogger.Info("request received", zap.String("auth", userToken))
+        ^
+
+9 issues: loglint: 9
+```
+
+Running with `--fix` applies all auto-fixable suggestions:
+
+```
+$ CONFIG_PATH=./config/config.yaml golangci-lint run --fix ./examples/ex.go
+```
+
+After auto-fix the file becomes:
+
+```go
+logger.Info("starting server on port 8080")  // ✅ first letter lowercased
+logger.Warn("server started ")               // ✅ special chars and emoji removed
+logger.Info("password /REDACTED/")           // ✅ inline password redacted by pattern
+
+zapLogger.Info("failed to process request")  // ✅ first letter lowercased
+zapLogger.Warn("connection lost ")           // ✅ special chars and emoji removed
+```
+
+Remaining issues after `--fix` require **manual intervention**:
+
+| Issue | Why auto-fix is not possible |
+|-------|------------------------------|
+| `log message must be in English` | Cannot translate text statically |
+| `log message contains sensitive keyword` (via variable name) | Cannot rename variables or remove arguments |
 
 ## Run tests
 
 ```bash
 go test ./...
-```
-
-## Auto-fix
-
-When `auto_fix.enabled: true`, suggested fixes can be applied with:
-
-```bash
-CONFIG_PATH=./config/config.yaml golangci-lint run --fix ./...
-```
-
-```go
-// before
-slog.Info("Starting server")
-
-// after auto-fix
-slog.Info("starting server")
 ```
 
 ## Platform support
@@ -188,6 +258,6 @@ The golangci-lint `.so` plugin works **Linux only** (Go limitation for `buildmod
 For macOS and Windows use the standalone binary via `go vet`:
 
 ```bash
-go build -o selectellinter ./cmd/linter/
-CONFIG_PATH=./config/config.yaml go vet -vettool=./selectellinter ./...
+go build -o loglinter ./cmd/linter/
+CONFIG_PATH=./config/config.yaml go vet -vettool=./loglinter ./...
 ```
