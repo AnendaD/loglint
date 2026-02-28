@@ -41,7 +41,7 @@ jobs:
           cache: true
 
       - name: Build standalone binary
-        run: go build -o selectellinter ./cmd/main/
+        run: go build -o selectellinter ./cmd/linter/
 
       - name: Build golangci-lint plugin
         run: CGO_ENABLED=1 go build -buildmode=plugin -o loglint.so ./cmd/plugin/
