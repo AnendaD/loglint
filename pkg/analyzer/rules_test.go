@@ -112,26 +112,3 @@ func TestRemoveSpecialOrEmoji(t *testing.T) {
 		}
 	}
 }
-
-// redactKeyWord
-
-func TestRedactKeyWord(t *testing.T) {
-	tests := []struct {
-		s       string
-		keyword string
-		want    string
-	}{
-		{"user password: abc", "password", "user [REDACTED]: abc"},
-		{"api_key=123", "api_key", "[REDACTED]=123"},
-		{"no sensitive info here", "password", "no sensitive info here"},
-		{"PASSWORD uppercase", "password", "[REDACTED] uppercase"},       // case-insensitive
-		{"token: abc token: def", "token", "[REDACTED]: abc token: def"}, // только первое вхождение
-		{"", "password", ""},
-	}
-	for _, tc := range tests {
-		got := redactKeyWord(tc.s, tc.keyword)
-		if got != tc.want {
-			t.Errorf("redactKeyWord(%q, %q) = %q, want %q", tc.s, tc.keyword, got, tc.want)
-		}
-	}
-}

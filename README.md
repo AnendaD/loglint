@@ -15,7 +15,7 @@ Go linter for log message validation. Checks log calls from `log/slog` and `go.u
 ## Project structure
 
 ```
-selectellinter/
+loglinter/
 ├── cmd/
 │   ├── linter/
 │   │   └── main.go          # standalone binary
@@ -49,7 +49,7 @@ selectellinter/
 ### Standalone binary
 
 ```bash
-go build -o selectellinter ./cmd/linter/
+go build -o loglinter ./cmd/linter/
 ```
 
 Run against a package:

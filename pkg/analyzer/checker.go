@@ -66,7 +66,7 @@ func runWithConfig(cfg *config.Config) func(*analysis.Pass) (any, error) {
 	}
 }
 
-// Check if the call expretion is a log call
+// Check if the call expression is a log call
 func isLogger(pkgName *types.PkgName) bool {
 	pkgPath := pkgName.Imported().Path()
 
@@ -76,7 +76,7 @@ func isLogger(pkgName *types.PkgName) bool {
 	return false
 }
 
-// Check if the call expretion is a logger variable
+// Check if the call expression is a logger variable
 func isLoggerVar(t types.Type) bool {
 	if ptr, ok := t.(*types.Pointer); ok {
 		t = ptr.Elem()
@@ -90,7 +90,6 @@ func isLoggerVar(t types.Type) bool {
 	if pkg == nil {
 		return false
 	}
-	//typeName := named.Obj().Name()
 	pkgPath := pkg.Path()
 	if _, ok := knownPacks[pkgPath]; ok {
 		return true
@@ -98,7 +97,7 @@ func isLoggerVar(t types.Type) bool {
 	return false
 }
 
-// Check if the call expretion is a function that returns a logger variable
+// Check if the call expression is a function that returns a logger variable
 func isLoggerFunc(fn *types.Func) bool {
 	sig, ok := fn.Type().(*types.Signature)
 	if !ok {

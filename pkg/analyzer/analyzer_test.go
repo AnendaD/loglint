@@ -9,22 +9,16 @@ import (
 	"golang.org/x/tools/go/analysis/analysistest"
 )
 
-// testdata - это путь к папке, где лежат наши тестовые директории.
-// analysistest.TestData() как раз ищет папку testdata относительно текущего файла.
-// Но мы можем указать и абсолютный путь.
 var testdataPath = analysistest.TestData()
 
 func TestAnalyzer_LowercaseRule(t *testing.T) {
-	// Создаем конфиг, где включено только нужное правило
 	cfg := &config.Config{
 		Rules: config.Rules{
 			Lowercase: true,
-			// все остальные false
 		},
 		SensitiveKeywords: []string{},
 	}
 	a := analyzer.NewAnalyzer(cfg)
-	// Запускаем анализ для папки "lowercase"
 	analysistest.Run(t, testdataPath, a, "lowercase")
 }
 

@@ -249,12 +249,3 @@ func removeSpecialOrEmoji(s string) string {
 	}
 	return string(res)
 }
-
-func redactKeyWord(s, keyWord string) string {
-	lower := strings.ToLower(s)
-	idx := strings.Index(lower, strings.ToLower(keyWord))
-	if idx == -1 {
-		return s
-	}
-	return s[:idx] + "[REDACTED]" + s[idx+len(keyWord):]
-}
