@@ -1,0 +1,48 @@
+rules:
+  lowercase: true
+  english: true
+  special_chars: true
+  sensitive_keywords: true
+  custom_patterns: true
+
+auto_fix:
+  enabled: true
+  lowercase: true
+  special_chars: true
+  sensitive_keywords: true
+  custom_patterns: true
+
+sensitive_keywords:
+  - password
+  - token
+  - api_key
+  - secret
+  - credit_card
+  - ssn
+  - private_key
+  - auth
+
+custom_patterns:
+  - name: aws_key
+    pattern: "(?i)AKIA[0-9A-Z]{16}"
+    message: "AWS access key detected"
+    auto_fix: true
+    replacement: "AWS_KEY /REDACTED/ "
+
+  - name: jwt_token
+    pattern: "eyJ[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+"
+    message: "JWT token detected"
+    auto_fix: true
+    replacement: "JWT /REDACTED/"
+
+  - name: password_inline
+    pattern: "(?i)password\\s*[:=]\\s*\\S+"
+    message: "inline password value detected"
+    auto_fix: true
+    replacement: "password /REDACTED/"
+
+  - name: bearer_token
+    pattern: "(?i)Bearer\\s+[a-zA-Z0-9\\-._~+/]+=*"
+    message: "Bearer token detected"
+    auto_fix: true
+    replacement: "Bearer /REDACTED/"

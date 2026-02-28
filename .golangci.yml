@@ -1,0 +1,30 @@
+version: "2"
+linters:
+  enable:
+    - loglint
+  settings:
+    custom:
+      loglint:
+        path: /home/anenda/linter/loglint.so
+        description: Linter for log messages
+        settings:
+          config_path: /home/anenda/linter/config/config.yaml
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+
