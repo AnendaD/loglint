@@ -17,10 +17,10 @@ Go linter for log message validation. Checks log calls from `log/slog` and `go.u
 ```
 selectellinter/
 ├── cmd/
-│   ├── main/
+│   ├── linter/
 │   │   └── main.go          # standalone binary
 │   └── plugin/
-│       └── plugin.go        # golangci-lint plugin
+│       └── main.go          # golangci-lint plugin
 ├── config/
 │   ├── config.go
 │   └── config.yaml          # example config
@@ -29,20 +29,18 @@ selectellinter/
 │       ├── analyzer.go      # analysis.Analyzer definition
 │       ├── checker.go       # AST traversal, logger detection
 │       ├── rules.go         # rule implementations
+│       ├── rules_test.go
+│       ├── analyzer_test.go
+│       ├── testdata/        # analysistest data
 │       └── detector/
-│           └── detector.go  # regex pattern detector
-├── testdata/
-│   ├── lowercase/
-│   ├── english/
-│   ├── specialchars/
-│   ├── sensitive/
-│   └── custom/          
+│           ├── detector.go  # regex pattern detector
+│           └── detector_test.go
 └── .golangci.yml
 ```
 
 ## Requirements
 
-- Go 1.26.0
+- Go 1.22+
 - `CGO_ENABLED=1` (required for the golangci-lint plugin)
 - golangci-lint v2.x
 
@@ -51,18 +49,20 @@ selectellinter/
 ### Standalone binary
 
 ```bash
-go build -buildmode=plugin -o loglint.so ./cmd/plugin/
+go build -o selectellinter ./cmd/linter/
 ```
 
 Run against a package:
 
 ```bash
-CONFIG_PATH=./config.yaml ./selectellinter ./...
+CONFIG_PATH=./config/config.yaml ./selectellinter ./...
 ```
 
 ### golangci-lint plugin
 
 The plugin and golangci-lint **must be built with the same Go version and dependencies**.
+
+> **Note:** The `.so` plugin requires Linux and `CGO_ENABLED=1`. The official golangci-lint binary is built without CGO, so the plugin must be used with a locally installed golangci-lint.
 
 ```bash
 # Check which Go version golangci-lint was built with
@@ -74,7 +74,13 @@ CGO_ENABLED=1 go build -buildmode=plugin -o loglint.so ./cmd/plugin/
 
 ## Configuration
 
-Create a `local.yaml` (or any path, set via `CONFIG_PATH` env variable):
+Set the config path via `CONFIG_PATH` environment variable:
+
+```bash
+CONFIG_PATH=./config/config.yaml golangci-lint run ./...
+```
+
+`config/config.yaml` example:
 
 ```yaml
 rules:
@@ -87,7 +93,6 @@ rules:
 auto_fix:
   enabled: true
   lowercase: true
-  english: true
   special_chars: true
   sensitive_keywords: true
   custom_patterns: true
@@ -95,7 +100,7 @@ auto_fix:
 sensitive_keywords:
   - password
   - token
-  - apiKey
+  - api_key
   - secret
   - credit_card
 
@@ -115,41 +120,37 @@ custom_patterns:
 
 ## golangci-lint integration
 
-Add to `.golangci.yml`:
+`.golangci.yml`:
 
 ```yaml
 version: "2"
 
 linters:
+  enable:
+    - loglint
   settings:
     custom:
       loglint:
         path: ./loglint.so
         description: "Log message linter"
         original-url: selectellinter
-        settings:
-          config_path: ./config.yaml
-
-linters:
-  enable:
-    - loglint
 ```
 
-Set the config path before running:
+Run:
 
 ```bash
-CONFIG_PATH=./config.yaml golangci-lint run ./...
+CONFIG_PATH=./config/config.yaml golangci-lint run ./...
 ```
 
 ## Usage examples
 
 ```go
 // ❌ will be reported
-slog.Info("Starting server on port 8080")      // Log must start with a lowercase letter
-slog.Info("запуск сервера")                     // log message must be in English
-slog.Error("connection failed!!!")              // log message must not contain special characters or emoji
-slog.Debug("auth", "api_key", apiKey)           // log message contains sensitive keyword: "apiKey"
-slog.Info("key: AKIAIOSFODNN7EXAMPLE")          // AWS access key detected
+slog.Info("Starting server on port 8080")   // Log must start with a lowercase letter
+slog.Info("запуск сервера")                  // log message must be in English
+slog.Error("connection failed!!!")           // log message must not contain special characters or emoji
+slog.Debug("request", "api_key", apiKey)     // log message contains sensitive keyword: "api_key"
+slog.Info("key: AKIAIOSFODNN7EXAMPLE")       // AWS access key detected
 
 // ✅ correct
 slog.Info("starting server on port 8080")
@@ -166,17 +167,27 @@ go test ./...
 
 ## Auto-fix
 
-When `auto_fix.enabled: true`, golangci-lint will suggest fixes that can be applied with:
+When `auto_fix.enabled: true`, suggested fixes can be applied with:
 
 ```bash
-CONFIG_PATH=./config.yaml golangci-lint run --fix ./...
+CONFIG_PATH=./config/config.yaml golangci-lint run --fix ./...
 ```
 
-Example:
 ```go
 // before
 slog.Info("Starting server")
 
 // after auto-fix
 slog.Info("starting server")
+```
+
+## Platform support
+
+The golangci-lint `.so` plugin works **Linux only** (Go limitation for `buildmode=plugin`).
+
+For macOS and Windows use the standalone binary via `go vet`:
+
+```bash
+go build -o selectellinter ./cmd/linter/
+CONFIG_PATH=./config/config.yaml go vet -vettool=./selectellinter ./...
 ```
