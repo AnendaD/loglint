@@ -9,8 +9,8 @@ import (
 // Returns new analyzer
 func NewAnalyzer(cfg *config.Config) *analysis.Analyzer {
 	return &analysis.Analyzer{
-		Name: "linter",
-		Doc:  "Linter analyzer demo",
+		Name: "loglinter",
+		Doc:  "Go linter for log message validation",
 		Run:  runWithConfig(cfg),
 	}
 }
