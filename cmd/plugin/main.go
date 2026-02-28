@@ -1,8 +1,8 @@
 package main
 
 import (
-	"selectellinter/config"
-	"selectellinter/pkg/analyzer"
+	"github.com/AnendaD/loglint/config"
+	"github.com/AnendaD/loglint/pkg/analyzer"
 
 	"golang.org/x/tools/go/analysis"
 )
