@@ -66,7 +66,12 @@ jobs:
           go-version: '1.26.0'
           cache: true
 
+      - name: Build plugin
+        run: CGO_ENABLED=1 go build -buildmode=plugin -o loglint.so ./cmd/plugin/
+
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v7
         with:
           version: v2.10.1
+        env:
+          CONFIG_PATH: ./config/config.yaml

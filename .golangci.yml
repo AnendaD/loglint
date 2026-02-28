@@ -5,10 +5,10 @@ linters:
   settings:
     custom:
       loglint:
-        path: /home/anenda/linter/loglint.so
+        path: ./loglint.so
         description: Linter for log messages
         settings:
-          config_path: /home/anenda/linter/config/config.yaml
+          config_path: ./config/config.yaml
   exclusions:
     generated: lax
     presets:
