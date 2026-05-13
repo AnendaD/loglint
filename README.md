@@ -1,4 +1,4 @@
-# loglinter
+# Log linter
 
 Go linter for log message validation. Checks log calls from `log/slog` and `go.uber.org/zap` against a set of rules.
 
