@@ -3,8 +3,8 @@ package analyzer
 import (
 	"go/ast"
 	"go/token"
-	"github.com/AnendaD/loglint/config"
-	"github.com/AnendaD/loglint/pkg/analyzer/detector"
+	"linter/config"
+	"linter/pkg/analyzer/detector"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -17,11 +17,10 @@ import (
 //   - Must be in English only
 //   - No emojis or special characters allowed
 //   - No sensitive information allowed
-func checkLogMessage(pass *analysis.Pass, call *ast.CallExpr, cfg *config.Config, detectors []*detector.AWSDetector) {
+func checkLogMessage(pass *analysis.Pass, call *ast.CallExpr, cfg *config.Config, detectors []*detector.PatternDetector) {
 	if len(call.Args) == 0 {
 		return
 	}
-	// - Must start with a lowercase letter
 	msgArg := call.Args[0]
 	rules := cfg.Rules
 	if rules.Lowercase {
@@ -57,7 +56,6 @@ func checkLogMessage(pass *analysis.Pass, call *ast.CallExpr, cfg *config.Config
 		collectIdents(arg, &identNames)
 	}
 
-	//eng letters
 	if cfg.Rules.English {
 		flag := false
 		for _, lit := range literals {
@@ -74,7 +72,6 @@ func checkLogMessage(pass *analysis.Pass, call *ast.CallExpr, cfg *config.Config
 		}
 	}
 
-	//special chars or emojis
 	if cfg.Rules.SpecialChars {
 		for _, lit := range literals {
 			raw := lit.Value[1 : len(lit.Value)-1]
@@ -99,7 +96,6 @@ func checkLogMessage(pass *analysis.Pass, call *ast.CallExpr, cfg *config.Config
 		}
 	}
 
-	//keywords
 	if rules.SensitiveKeywords {
 		for _, ident := range identNames {
 			lower := strings.ToLower(ident)
@@ -114,7 +110,6 @@ func checkLogMessage(pass *analysis.Pass, call *ast.CallExpr, cfg *config.Config
 		}
 	}
 
-	//patterns
 	if cfg.Rules.CustomPatterns {
 		for i, lit := range literals {
 			raw := lit.Value[1 : len(lit.Value)-1]

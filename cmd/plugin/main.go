@@ -1,13 +1,19 @@
 package main
 
 import (
-	"github.com/AnendaD/loglint/config"
-	"github.com/AnendaD/loglint/pkg/analyzer"
+	"linter/config"
+	"linter/pkg/analyzer"
 
 	"golang.org/x/tools/go/analysis"
 )
 
-func New(conf any) ([]*analysis.Analyzer, error) {
-	cfg := config.MustLoad()
-	return []*analysis.Analyzer{analyzer.NewAnalyzer(cfg)}, nil
+type PluginSymbol struct {
+	Analyzer *analysis.Analyzer
 }
+
+func (p *PluginSymbol) Build() *analysis.Analyzer {
+	cfg := config.MustLoad()
+	return analyzer.NewAnalyzer(cfg)
+}
+
+var Plugin PluginSymbol

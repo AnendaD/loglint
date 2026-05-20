@@ -55,7 +55,7 @@ go build -o loglinter ./cmd/linter/
 Run against a package:
 
 ```bash
-CONFIG_PATH=./config/config.yaml ./selectellinter ./...
+CONFIG_PATH=./config/config.yaml ./linter ./...
 ```
 
 ### golangci-lint plugin
@@ -139,7 +139,7 @@ linters:
       loglint:
         path: ./loglint.so
         description: "Log message linter"
-        original-url: selectellinter
+        original-url: linter
 ```
 
 Run:

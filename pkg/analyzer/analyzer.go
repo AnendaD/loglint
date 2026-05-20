@@ -1,7 +1,7 @@
 package analyzer
 
 import (
-	"github.com/AnendaD/loglint/config"
+	"linter/config"
 
 	"golang.org/x/tools/go/analysis"
 )

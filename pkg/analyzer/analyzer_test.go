@@ -3,8 +3,8 @@ package analyzer_test
 import (
 	"testing"
 
-	"github.com/AnendaD/loglint/config"
-	"github.com/AnendaD/loglint/pkg/analyzer"
+	"linter/config"
+	"linter/pkg/analyzer"
 
 	"golang.org/x/tools/go/analysis/analysistest"
 )
@@ -13,6 +13,16 @@ var testdataPath = analysistest.TestData()
 
 func TestAnalyzer_LowercaseRule(t *testing.T) {
 	cfg := &config.Config{
+		KnownPacks: map[string]config.PackInfo{
+			"log/slog": {
+				Version: "1.0.0",
+				Enabled: true,
+			},
+			"go.uber.org/zap": {
+				Version: "1.26.0",
+				Enabled: true,
+			},
+		},
 		Rules: config.Rules{
 			Lowercase: true,
 		},
@@ -24,6 +34,16 @@ func TestAnalyzer_LowercaseRule(t *testing.T) {
 
 func TestAnalyzer_EnglishRule(t *testing.T) {
 	cfg := &config.Config{
+		KnownPacks: map[string]config.PackInfo{
+			"log/slog": {
+				Version: "1.0.0",
+				Enabled: true,
+			},
+			"go.uber.org/zap": {
+				Version: "1.26.0",
+				Enabled: true,
+			},
+		},
 		Rules: config.Rules{
 			English: true,
 		},
@@ -35,6 +55,16 @@ func TestAnalyzer_EnglishRule(t *testing.T) {
 
 func TestAnalyzer_SpecialCharsRule(t *testing.T) {
 	cfg := &config.Config{
+		KnownPacks: map[string]config.PackInfo{
+			"log/slog": {
+				Version: "1.0.0",
+				Enabled: true,
+			},
+			"go.uber.org/zap": {
+				Version: "1.26.0",
+				Enabled: true,
+			},
+		},
 		Rules: config.Rules{
 			SpecialChars: true,
 		},
@@ -46,6 +76,16 @@ func TestAnalyzer_SpecialCharsRule(t *testing.T) {
 
 func TestAnalyzer_SensitiveKeywordsRule(t *testing.T) {
 	cfg := &config.Config{
+		KnownPacks: map[string]config.PackInfo{
+			"log/slog": {
+				Version: "1.0.0",
+				Enabled: true,
+			},
+			"go.uber.org/zap": {
+				Version: "1.26.0",
+				Enabled: true,
+			},
+		},
 		Rules: config.Rules{
 			SensitiveKeywords: true,
 		},
@@ -57,6 +97,16 @@ func TestAnalyzer_SensitiveKeywordsRule(t *testing.T) {
 
 func TestAnalyzer_CustomPatternsRule(t *testing.T) {
 	cfg := &config.Config{
+		KnownPacks: map[string]config.PackInfo{
+			"log/slog": {
+				Version: "1.0.0",
+				Enabled: true,
+			},
+			"go.uber.org/zap": {
+				Version: "1.26.0",
+				Enabled: true,
+			},
+		},
 		Rules: config.Rules{
 			CustomPatterns: true,
 		},

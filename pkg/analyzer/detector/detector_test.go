@@ -1,7 +1,7 @@
 package detector_test
 
 import (
-	"github.com/AnendaD/loglint/pkg/analyzer/detector"
+	"linter/pkg/analyzer/detector"
 	"testing"
 )
 
@@ -46,7 +46,7 @@ func TestAWSDetector_Detect(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			d := detector.NewAWSDetector(tc.pattern)
+			d := detector.NewPatternDetector(tc.pattern)
 			got := d.Detect(tc.input)
 			if len(got) != tc.want {
 				t.Errorf("Detect(%q) = %d matches, want %d", tc.input, len(got), tc.want)
@@ -88,7 +88,7 @@ func TestAWSDetector_Replace(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			d := detector.NewAWSDetector(tc.pattern)
+			d := detector.NewPatternDetector(tc.pattern)
 			got := d.Replace(tc.input, tc.replacement)
 			if got != tc.want {
 				t.Errorf("Replace(%q) = %q, want %q", tc.input, got, tc.want)

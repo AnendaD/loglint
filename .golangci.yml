@@ -5,7 +5,7 @@ linters:
   settings:
     custom:
       loglint:
-        path: ./loglint.so
+        path: ./bin/loglint.so
         description: Linter for log messages
         settings:
           config_path: ./config/config.yaml
@@ -27,4 +27,3 @@ formatters:
       - third_party$
       - builtin$
       - examples$
-

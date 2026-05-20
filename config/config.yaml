@@ -1,3 +1,11 @@
+knownPacks:
+  log/slog:
+    version: "1.0.0"
+    enabled: true
+  go.uber.org/zap:
+    version: "1.26.0"
+    enabled: true
+
 rules:
   lowercase: true
   english: true

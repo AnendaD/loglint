@@ -8,10 +8,16 @@ import (
 )
 
 type Config struct {
-	Rules             Rules           `yaml:"rules" json:"rules" env-required:"true"`
-	AutoFix           AutoFix         `yaml:"auto_fix" json:"auto_fix" env-required:"true"`
-	SensitiveKeywords []string        `yaml:"sensitive_keywords" json:"sensitive_keywords" env-required:"true"`
-	CustomPatterns    []CustomPattern `yaml:"custom_patterns" json:"custom_patterns"`
+	KnownPacks        map[string]PackInfo `yaml:"knownPacks" json:"knownPacks" env-required:"true"`
+	Rules             Rules               `yaml:"rules" json:"rules" env-required:"true"`
+	AutoFix           AutoFix             `yaml:"auto_fix" json:"auto_fix" env-required:"true"`
+	SensitiveKeywords []string            `yaml:"sensitive_keywords" json:"sensitive_keywords" env-required:"true"`
+	CustomPatterns    []CustomPattern     `yaml:"custom_patterns" json:"custom_patterns"`
+}
+
+type PackInfo struct {
+	Version string `yaml:"version" json:"version"`
+	Enabled bool   `yaml:"enabled" json:"enabled"`
 }
 
 type Rules struct {
@@ -58,9 +64,7 @@ func MustLoadPath(path string) *Config {
 }
 
 func fetchConfigPath() string {
-	var configPath string
-
-	configPath = os.Getenv("CONFIG_PATH")
+	configPath := os.Getenv("CONFIG_PATH")
 	if configPath != "" {
 		return configPath
 	}
@@ -72,5 +76,5 @@ func fetchConfigPath() string {
 		}
 	}
 
-	return configPath
+	return ""
 }

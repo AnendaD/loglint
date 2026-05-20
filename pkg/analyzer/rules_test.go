@@ -4,8 +4,6 @@ import (
 	"testing"
 )
 
-// isEnglishLetter
-
 func TestIsEnglishLetter(t *testing.T) {
 	tests := []struct {
 		r    rune
@@ -15,10 +13,10 @@ func TestIsEnglishLetter(t *testing.T) {
 		{'z', true},
 		{'A', true},
 		{'Z', true},
-		{'м', false}, // кириллица
-		{'é', false}, // латиница с диакритикой
-		{'中', false}, // китайский
-		{'1', false}, // цифра — не буква вообще, но функция вернёт false
+		{'м', false},
+		{'é', false},
+		{'中', false},
+		{'1', false},
 		{' ', false},
 	}
 	for _, tc := range tests {
@@ -29,27 +27,25 @@ func TestIsEnglishLetter(t *testing.T) {
 	}
 }
 
-// isSpecialOrEmoji
-
 func TestIsSpecialOrEmoji(t *testing.T) {
 	tests := []struct {
 		r           rune
-		wantSpecial bool // первое возвращаемое значение
+		wantSpecial bool
 	}{
 		{'a', false},
 		{'Z', false},
 		{'1', false},
-		{' ', false}, // пробел — не специальный
-		{'-', false}, // разрешённый символ
+		{' ', false},
+		{'-', false},
 		{'_', false},
 		{'.', false},
 		{',', false},
 		{':', false},
 		{'/', false},
 		{'\\', false},
-		{'!', true}, // запрещён
+		{'!', true},
 		{'?', true},
-		{'🚀', true}, // эмодзи
+		{'🚀', true},
 		{'@', true},
 		{'#', true},
 		{'(', true},
@@ -63,8 +59,6 @@ func TestIsSpecialOrEmoji(t *testing.T) {
 	}
 }
 
-// hasSpecialOrEmoji
-
 func TestHasSpecialOrEmoji(t *testing.T) {
 	tests := []struct {
 		input string
@@ -73,14 +67,14 @@ func TestHasSpecialOrEmoji(t *testing.T) {
 		{"server started", false},
 		{"connection failed", false},
 		{"something went wrong", false},
-		{"server started!", true},                  // восклицательный знак
-		{"server started🚀", true},                  // эмодзи
-		{"connection failed!!!", true},             // повторяющиеся !
-		{"warning: something went wrong...", true}, // многоточие
+		{"server started!", true},
+		{"server started🚀", true},
+		{"connection failed!!!", true},
+		{"warning: something went wrong...", true},
 		{"failed to connect to db", false},
-		{"user-agent received", false}, // дефис разрешён
-		{"key_value pair", false},      // подчёркивание разрешено
-		{"port 8080/tcp", false},       // слэш разрешён
+		{"user-agent received", false},
+		{"key_value pair", false},
+		{"port 8080/tcp", false},
 		{"path: /usr/bin", false},
 	}
 	for _, tc := range tests {
@@ -90,8 +84,6 @@ func TestHasSpecialOrEmoji(t *testing.T) {
 		}
 	}
 }
-
-// removeSpecialOrEmoji
 
 func TestRemoveSpecialOrEmoji(t *testing.T) {
 	tests := []struct {
@@ -103,7 +95,7 @@ func TestRemoveSpecialOrEmoji(t *testing.T) {
 		{"server started🚀", "server started"},
 		{"something went wrong...", "something went wrong"},
 		{"hello world", "hello world"},
-		{"key: value", "key: value"}, // одно двоеточие разрешено
+		{"key: value", "key: value"},
 	}
 	for _, tc := range tests {
 		got := removeSpecialOrEmoji(tc.input)
